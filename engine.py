@@ -55,12 +55,8 @@ sim_matrix = linear_kernel(tfidf_matrix, tfidf_matrix)
 
 
 #Functions
-def make_clickable(url, name):
-    return '<a href="{}" rel="noopener noreferrer" target="_blank">{}</a>'.format(url,name)
     
 
-
-df['link'] = df.apply(lambda x: make_clickable(x['Url'], x['Event']), axis=1)
 
 
 
@@ -73,7 +69,7 @@ def content_based_recommender(Event, sim_scores=sim_matrix):
     event_indices = [i[0] for i in sim_scores]
     result = df['Event'].iloc[event_indices]
     rec_df = pd.DataFrame(result)
-    rec_df['Url'] = df.apply(lambda x: make_clickable(x['Url'], x['Event']), axis=1).iloc[event_indices] 
+    rec_df['Url'] = df['Url'].iloc[event_indices]
     return rec_df
 
 def find_url(Event, sim_scores=sim_matrix):
@@ -85,7 +81,7 @@ def find_url(Event, sim_scores=sim_matrix):
     event_indices = [i[0] for i in sim_scores]
     result = df['Event'].iloc[event_indices]
     rec_df = pd.DataFrame(result)
-    rec_df['Url'] = df.apply(lambda x: make_clickable(x['Url'], x['Event']), axis=1).iloc[event_indices] 
+    rec_df['Url'] = df['Url'].iloc[event_indices]
     return rec_df
 
 st.markdown("<h1 style='text-align: center; color: purple;'>Thunder Bay Volunteering System</h1>", unsafe_allow_html=True)
