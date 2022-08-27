@@ -9,14 +9,6 @@ from PIL import Image
 img= Image.open('logo.png')
 st.set_page_config(page_title='Thunder Bay Volunteering Event Recommendation', page_icon=img)
 
-#Term Frequency
-indices = pd.Series(df.index, index=df['Event']).drop_duplicates()
-from sklearn.feature_extraction.text import TfidfVectorizer
-tfidf_vector = TfidfVectorizer(stop_words='english')
-df['Information'] = df['Information'].fillna('')
-tfidf_matrix = tfidf_vector.fit_transform(df['Information'])
-from sklearn.metrics.pairwise import linear_kernel
-sim_matrix = linear_kernel(tfidf_matrix, tfidf_matrix)
 
 #design
 col1, col2, col3 = st.columns(3)
@@ -44,6 +36,15 @@ selected3 = option_menu(None, ["Home", "Recommend"],
 #Load the Data
 df = pd.read_csv("Volunteering - Sheet1.csv")
 df.head()
+
+#Term Frequency
+indices = pd.Series(df.index, index=df['Event']).drop_duplicates()
+from sklearn.feature_extraction.text import TfidfVectorizer
+tfidf_vector = TfidfVectorizer(stop_words='english')
+df['Information'] = df['Information'].fillna('')
+tfidf_matrix = tfidf_vector.fit_transform(df['Information'])
+from sklearn.metrics.pairwise import linear_kernel
+sim_matrix = linear_kernel(tfidf_matrix, tfidf_matrix)
 
 
 #Functions
