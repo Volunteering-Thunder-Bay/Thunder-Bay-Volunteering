@@ -33,13 +33,13 @@ selected3 = option_menu(None, ["Home", "Recommend"],
         "nav-link-selected": {"background-color": "grey"},
     }
 )
-hide_menu_style = """
-        <style>
+#hide_menu_style = """
+        #<style>
         #MainMenu {visibility:hidden;}
-        footer {visibility: hidden;}
-        </style>
+        #footer {visibility: hidden;}
+       # </style>
         """
-st.markdown(hide_menu_style, unsafe_allow_html=True)
+#st.markdown(hide_menu_style, unsafe_allow_html=True)
 
 df = pd.read_csv("Volunteering - Sheet1.csv")
 df.head()
