@@ -55,9 +55,14 @@ sim_matrix = linear_kernel(tfidf_matrix, tfidf_matrix)
 
 
 #Functions
-    
+def make_clickable(link):
+    # target _blank to open new window
+    # extract clickable text to display for your link
+    text = link.split('=')[0]
+    return f'<a target="_blank" href="{link}">{text}</a>'
 
-
+# TRAILER is the column with hyperlinks
+df['Url'] = df['Url'].apply(make_clickable)
 
 
 def content_based_recommender(Event, sim_scores=sim_matrix):
@@ -67,10 +72,11 @@ def content_based_recommender(Event, sim_scores=sim_matrix):
     sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True)
     sim_scores = sim_scores[1:11]
     event_indices = [i[0] for i in sim_scores]
+    df.style.format({'Url': make_clickable})
     result = df['Event'].iloc[event_indices]
     rec_df = pd.DataFrame(result)
     rec_df['Url'] = df['Url'].iloc[event_indices]
-    return rec_df
+    rec_df['Url'] = st.write(rec_df.to_html(escape=False, index=False), unsafe_allow_html=True)
 
 def find_url(Event, sim_scores=sim_matrix):
     indices.to_frame()
@@ -82,7 +88,14 @@ def find_url(Event, sim_scores=sim_matrix):
     result = df['Event'].iloc[event_indices]
     rec_df = pd.DataFrame(result)
     rec_df['Url'] = df['Url'].iloc[event_indices]
-    return rec_df
+    rec_df['Url'] = st.write(rec_df.to_html(escape=False, index=False), unsafe_allow_html=True)
+    #return rec_df
+    
+
+
+
+
+
 
 st.markdown("<h1 style='text-align: center; color: purple;'>Thunder Bay Volunteering System</h1>", unsafe_allow_html=True)
 primaryColor = "#E694FF"
