@@ -38,7 +38,7 @@ selected3 = option_menu(None, ["Home", "Recommend"],
         #MainMenu {visibility:hidden;}
         #footer {visibility: hidden;}
        # </style>
-        """
+        #"""
 #st.markdown(hide_menu_style, unsafe_allow_html=True)
 
 df = pd.read_csv("Volunteering - Sheet1.csv")
