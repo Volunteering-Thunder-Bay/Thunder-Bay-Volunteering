@@ -101,7 +101,13 @@ if selected3=='Home':
     if st.button('Find'):
         search_url = find_url(selected_volunteer_event)
         st.write(search_url)
-
+hide_menu_style = """
+        <style>
+        #MainMenu {visibility:hidden;}
+        footer {visibility: hidden;}
+        </style>
+        """
+st.markdown(hide_menu_style, unsafe_allow_html=True)
 
 #Button selection
 if selected3=='Recommend':
