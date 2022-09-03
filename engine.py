@@ -3,6 +3,7 @@ import streamlit as st
 from streamlit_option_menu import option_menu
 import pickle
 import pandas as pd
+from IPython.display import HTML
 
 #indices = pickle.load(open('indices', 'rb'))
 #sim_matrix = pickle.load(open('sim_matrix', 'rb'))
@@ -23,7 +24,7 @@ with col3:
     st.write(' ')
 
 
-selected3 = option_menu(None, ["Home", "Recommend", "Contact Us"], 
+selected3 = option_menu(None, ["Home", "Recommend"], 
     icons=['house', 'book', "envelope"], 
     menu_icon="cast", default_index=0, orientation="horizontal",
     styles={
@@ -42,9 +43,11 @@ hide_menu_style = """
 st.markdown(hide_menu_style, unsafe_allow_html=True)
 
 df = pd.read_csv("Volunteering - Sheet1.csv")
+HTML(df.to_html(render_links=True, escape=False))
 df.head()
 
 
+HTML(df.to_html(render_links=True, escape=False))
 indices = pd.Series(df.index, index=df['Event']).drop_duplicates()
 from sklearn.feature_extraction.text import TfidfVectorizer
 tfidf_vector = TfidfVectorizer(stop_words='english')
@@ -88,7 +91,6 @@ def find_url(Event, sim_scores=sim_matrix):
     rec_df['Url'] = df.apply(lambda x: make_clickable(x['Url'], x['Event']), axis=1).iloc[event_indices] 
     return rec_df
 
-st.markdown("<h1 style='text-align: center; color: purple;'>Thunder Bay Volunteering System</h1>", unsafe_allow_html=True)
 
 
 contact_form = """
@@ -105,8 +107,10 @@ contact_form = """
 #design
 
 
-selected_volunteer_event = st.selectbox("Volunteering Events:", df['Event'].values)
+
 if selected3=='Home':
+    st.markdown("<h1 style='text-align: center; color: purple;'>Thunder Bay Volunteering System</h1>", unsafe_allow_html=True)
+    selected_volunteer_event = st.selectbox("Volunteering Events:", df['Event'].values)
     if st.button('Find'):
         search_url = find_url(selected_volunteer_event)
         st.write(search_url)
@@ -120,6 +124,8 @@ def local_css(file_name):
 
 
 if selected3=='Recommend':
+    st.markdown("<h1 style='text-align: center; color: purple;'>Thunder Bay Volunteering System</h1>", unsafe_allow_html=True)
+    selected_volunteer_event = st.selectbox("Volunteering Events:", df['Event'].values)
     if st.button('Recommend'):
         recommendations = content_based_recommender(selected_volunteer_event)
         st.write(recommendations)
