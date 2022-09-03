@@ -3,7 +3,6 @@ import streamlit as st
 from streamlit_option_menu import option_menu
 import pickle
 import pandas as pd
-from IPython.display import HTML
 indices = pickle.load(open('indices', 'rb'))
 sim_matrix = pickle.load(open('sim_matrix', 'rb'))
 from PIL import Image
