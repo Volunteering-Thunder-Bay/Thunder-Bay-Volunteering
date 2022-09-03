@@ -3,7 +3,6 @@ import streamlit as st
 from streamlit_option_menu import option_menu
 import pickle
 import pandas as pd
-from IPython.display import HTML
 
 #indices = pickle.load(open('indices', 'rb'))
 #sim_matrix = pickle.load(open('sim_matrix', 'rb'))
@@ -43,11 +42,9 @@ hide_menu_style = """
 st.markdown(hide_menu_style, unsafe_allow_html=True)
 
 df = pd.read_csv("Volunteering - Sheet1.csv")
-HTML(df.to_html(render_links=True, escape=False))
 df.head()
 
 
-HTML(df.to_html(render_links=True, escape=False))
 indices = pd.Series(df.index, index=df['Event']).drop_duplicates()
 from sklearn.feature_extraction.text import TfidfVectorizer
 tfidf_vector = TfidfVectorizer(stop_words='english')
