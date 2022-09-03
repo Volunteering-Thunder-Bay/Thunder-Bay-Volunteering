@@ -24,7 +24,7 @@ with col3:
     st.write(' ')
 
 
-selected3 = option_menu(None, ["Home", "Recommend"], 
+selected3 = option_menu(None, ["Home", "Recommend", "Contact Us"], 
     icons=['house', 'book', "envelope"], 
     menu_icon="cast", default_index=0, orientation="horizontal",
     styles={
