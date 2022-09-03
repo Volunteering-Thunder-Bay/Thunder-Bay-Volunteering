@@ -1,16 +1,21 @@
-#Load Packages
+
 import streamlit as st
 from streamlit_option_menu import option_menu
 import pickle
 import pandas as pd
-
+from IPython.display import HTML
+indices = pickle.load(open('indices', 'rb'))
+sim_matrix = pickle.load(open('sim_matrix', 'rb'))
 from PIL import Image
 
-img= Image.open('logo.png')
-st.set_page_config(page_title='Thunder Bay Volunteering Event Recommendation', page_icon=img)
-
-
 #design
+img= Image.open('logo.png')
+st.set_page_config(page_title='Thunder Bay Volunteering Event Recommendation', page_icon=img,)
+
+# get colors from theme config file, or set the colours to altair standards
+
+
+
 col1, col2, col3 = st.columns(3)
 
 with col1:
@@ -22,29 +27,32 @@ with col2:
 with col3:
     st.write(' ')
 
-selected3 = option_menu(None, ["Home", "Recommend"], 
+
+selected3 = option_menu(None, ["Home", "Recommend", "Contact Us"], 
     icons=['house', 'book', "envelope"], 
     menu_icon="cast", default_index=0, orientation="horizontal",
     styles={
         "container": {"padding": "0!important", "background-color": "#purple"},
-        "icon": {"color": "purple", "font-size": "25px"}, 
+        "icon": {"color": "white", "font-size": "25px"}, 
         "nav-link": {"font-size": "25px", "text-align": "left", "margin":"0px", "--hover-color": "#eee"},
-        "nav-link-selected": {"background-color": "grey"},
+        "nav-link-selected": {"background-color": "purple"},
     }
 )
 
-#Load the Data
-df = pd.read_csv("Volunteering - Sheet1.csv")
-df.head()
 
-#Term Frequency
-indices = pd.Series(df.index, index=df['Event']).drop_duplicates()
-from sklearn.feature_extraction.text import TfidfVectorizer
-tfidf_vector = TfidfVectorizer(stop_words='english')
-df['Information'] = df['Information'].fillna('')
-tfidf_matrix = tfidf_vector.fit_transform(df['Information'])
-from sklearn.metrics.pairwise import linear_kernel
-sim_matrix = linear_kernel(tfidf_matrix, tfidf_matrix)
+
+
+#hide_menu_style = """
+        #<style>
+        #MainMenu {visibility:hidden;}
+        #footer {visibility: hidden;}
+        #</style>
+        #"""
+#st.markdown(hide_menu_style, unsafe_allow_html=True)
+
+
+volunteering_dict = pickle.load(open('v.pkl','rb'))
+df = pd.DataFrame(volunteering_dict)
 
 
 #Functions
@@ -54,10 +62,11 @@ def make_clickable(link):
     text = link.split('=')[0]
     return f'<a target="_blank" href="{link}">{text}</a>'
 
-# Url is the column with hyperlinks
+# TRAILER is the column with hyperlinks
 df['Url'] = df['Url'].apply(make_clickable)
 
-#Recommendations
+
+
 def content_based_recommender(Event, sim_scores=sim_matrix):
     indices.to_frame()
     idx = indices[Event]
@@ -71,7 +80,6 @@ def content_based_recommender(Event, sim_scores=sim_matrix):
     rec_df['Url'] = df['Url'].iloc[event_indices]
     rec_df['Url'] = st.write(rec_df.to_html(escape=False, index=False), unsafe_allow_html=True)
 
-#Search
 def find_url(Event, sim_scores=sim_matrix):
     indices.to_frame()
     idx = indices[Event]
@@ -83,36 +91,56 @@ def find_url(Event, sim_scores=sim_matrix):
     rec_df = pd.DataFrame(result)
     rec_df['Url'] = df['Url'].iloc[event_indices]
     rec_df['Url'] = st.write(rec_df.to_html(escape=False, index=False), unsafe_allow_html=True)
-
+    #return rec_df
     
-#Design 
-st.markdown("<h1 style='text-align: center; color: purple;'>Thunder Bay Volunteering System</h1>", unsafe_allow_html=True)
-primaryColor = "#E694FF"
-backgroundColor = "#00172B"
-secondaryBackgroundColor = "#0083B8"
-textColor = "#C6CDD4"
-font = "Open Sans"
+    
+    #url = 
+    #rec_df['Url'] = st.write("[Url](%s)" % url)
+   
 
 
 
-#Navigation Bar
-selected_volunteer_event = st.selectbox("Volunteering Events:", df['Event'].values)
+contact_form = """
+<form action="https://formsubmit.co/joshuaphilip2140@gmail.com" method="POST">
+    <input type="text" name="name" placeholder="Name" required>
+    <input type="email" name="email" placeholder="Email" required>
+    <textarea name="message" placeholder="Send us an Event"></textarea>
+    <input type="hidden" name="_captcha" value="false">
+    <button type="submit">Send</button>
+</form>
+"""
+
+
+
+#design
+
+
+
 if selected3=='Home':
+    st.markdown("<h1 style='text-align: center; color: purple;'>Thunder Bay Volunteering System</h1>", unsafe_allow_html=True)
+    selected_volunteer_event = st.selectbox("Volunteering Events:", df['Event'].values)
     if st.button('Find'):
         search_url = find_url(selected_volunteer_event)
         st.write(search_url)
-hide_menu_style = """
-        <style>
-        #MainMenu {visibility:hidden;}
-        footer {visibility: hidden;}
-        </style>
-        """
-st.markdown(hide_menu_style, unsafe_allow_html=True)
 
-#Button selection
+#Use a local css file
+def local_css(file_name):
+    with open(file_name) as f:
+        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+
+
+
 if selected3=='Recommend':
+    st.markdown("<h1 style='text-align: center; color: purple;'>Thunder Bay Volunteering System</h1>", unsafe_allow_html=True)
+    selected_volunteer_event = st.selectbox("Volunteering Events:", df['Event'].values)
     if st.button('Recommend'):
         recommendations = content_based_recommender(selected_volunteer_event)
         st.write(recommendations)
-        
+
+if selected3=='Contact Us':
+    st.header(":mailbox: Send us an Event")
+    st.markdown(contact_form, unsafe_allow_html=True)
+    local_css("styles.css")   
+
+
 
