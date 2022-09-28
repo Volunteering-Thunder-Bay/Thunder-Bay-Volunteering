@@ -48,8 +48,8 @@ selected3 = option_menu(None, ["Home", "Recommend", "Contact Us"],
 #st.markdown(hide_menu_style, unsafe_allow_html=True)
 
 
-volunteering_dict = pickle.load(open('v.pkl','rb'))
-df = pd.DataFrame(volunteering_dict)
+
+df = pd.DataFrame(Volunteering - Sheet1.csv)
 
 
 #Functions
