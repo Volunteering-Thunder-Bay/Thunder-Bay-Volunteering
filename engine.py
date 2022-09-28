@@ -1,16 +1,19 @@
-
 import streamlit as st
 from streamlit_option_menu import option_menu
 import pickle
 import pandas as pd
-
-
-#indices = pickle.load(open('indices', 'rb'))
-#sim_matrix = pickle.load(open('sim_matrix', 'rb'))
+from IPython.display import HTML
+indices = pickle.load(open('indices', 'rb'))
+sim_matrix = pickle.load(open('sim_matrix', 'rb'))
 from PIL import Image
+
 #design
 img= Image.open('logo.png')
-st.set_page_config(page_title='Thunder Bay Volunteering Event Recommendation', page_icon=img)
+st.set_page_config(page_title='Thunder Bay Volunteering Event Recommendation', page_icon=img,)
+
+# get colors from theme config file, or set the colours to altair standards
+
+
 
 col1, col2, col3 = st.columns(3)
 
@@ -29,11 +32,15 @@ selected3 = option_menu(None, ["Home", "Recommend", "Contact Us"],
     menu_icon="cast", default_index=0, orientation="horizontal",
     styles={
         "container": {"padding": "0!important", "background-color": "#purple"},
-        "icon": {"color": "purple", "font-size": "25px"}, 
+        "icon": {"color": "white", "font-size": "25px"}, 
         "nav-link": {"font-size": "25px", "text-align": "left", "margin":"0px", "--hover-color": "#eee"},
-        "nav-link-selected": {"background-color": "grey"},
+        "nav-link-selected": {"background-color": "purple"},
     }
 )
+
+
+
+
 #hide_menu_style = """
         #<style>
         #MainMenu {visibility:hidden;}
@@ -42,27 +49,20 @@ selected3 = option_menu(None, ["Home", "Recommend", "Contact Us"],
         #"""
 #st.markdown(hide_menu_style, unsafe_allow_html=True)
 
-df = pd.read_csv("Volunteering - Sheet1.csv")
 
-df.head()
-
-
-indices = pd.Series(df.index, index=df['Event']).drop_duplicates()
-from sklearn.feature_extraction.text import TfidfVectorizer
-tfidf_vector = TfidfVectorizer(stop_words='english')
-df['Information'] = df['Information'].fillna('')
-tfidf_matrix = tfidf_vector.fit_transform(df['Information'])
-from sklearn.metrics.pairwise import linear_kernel
-sim_matrix = linear_kernel(tfidf_matrix, tfidf_matrix)
+volunteering_dict = pickle.load(open('v.pkl','rb'))
+df = pd.DataFrame(volunteering_dict)
 
 
 #Functions
-def make_clickable(url, name):
-    return '<a href="{}" rel="noopener noreferrer" target="_blank">{}</a>'.format(url,name)
-    
+def make_clickable(link):
+    # target _blank to open new window
+    # extract clickable text to display for your link
+    text = link.split('=')[0]
+    return f'<a target="_blank" href="{link}">{text}</a>'
 
-
-df['link'] = df.apply(lambda x: make_clickable(x['Url'], x['Event']), axis=1)
+# TRAILER is the column with hyperlinks
+df['Url'] = df['Url'].apply(make_clickable)
 
 
 
@@ -73,10 +73,11 @@ def content_based_recommender(Event, sim_scores=sim_matrix):
     sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True)
     sim_scores = sim_scores[1:11]
     event_indices = [i[0] for i in sim_scores]
+    df.style.format({'Url': make_clickable})
     result = df['Event'].iloc[event_indices]
     rec_df = pd.DataFrame(result)
-    rec_df['Url'] = df.apply(lambda x: make_clickable(x['Url'], x['Event']), axis=1).iloc[event_indices] 
-    return rec_df
+    rec_df['Url'] = df['Url'].iloc[event_indices]
+    rec_df['Url'] = st.write(rec_df.to_html(escape=False, index=False), unsafe_allow_html=True)
 
 def find_url(Event, sim_scores=sim_matrix):
     indices.to_frame()
@@ -87,8 +88,14 @@ def find_url(Event, sim_scores=sim_matrix):
     event_indices = [i[0] for i in sim_scores]
     result = df['Event'].iloc[event_indices]
     rec_df = pd.DataFrame(result)
-    rec_df['Url'] = df.apply(lambda x: make_clickable(x['Url'], x['Event']), axis=1).iloc[event_indices] 
-    return rec_df
+    rec_df['Url'] = df['Url'].iloc[event_indices]
+    rec_df['Url'] = st.write(rec_df.to_html(escape=False, index=False), unsafe_allow_html=True)
+    #return rec_df
+    
+    
+    #url = 
+    #rec_df['Url'] = st.write("[Url](%s)" % url)
+   
 
 
 
@@ -103,6 +110,7 @@ contact_form = """
 """
 
 
+
 #design
 
 
@@ -113,7 +121,6 @@ if selected3=='Home':
     if st.button('Find'):
         search_url = find_url(selected_volunteer_event)
         st.write(search_url)
-
 
 #Use a local css file
 def local_css(file_name):
@@ -129,9 +136,8 @@ if selected3=='Recommend':
         recommendations = content_based_recommender(selected_volunteer_event)
         st.write(recommendations)
 
-
 if selected3=='Contact Us':
     st.header(":mailbox: Send us an Event")
     st.markdown(contact_form, unsafe_allow_html=True)
-    local_css("styles.css")   
+    local_css("styles.css") 
 
