@@ -2,7 +2,9 @@ import streamlit as st
 from streamlit_option_menu import option_menu
 import pickle
 import pandas as pd
-
+from IPython.display import HTML
+indices = pickle.load(open('indices', 'rb'))
+sim_matrix = pickle.load(open('sim_matrix', 'rb'))
 from PIL import Image
 
 #design
@@ -50,6 +52,7 @@ selected3 = option_menu(None, ["Home", "Recommend", "Contact Us"],
 
 volunteering_dict = pickle.load(open('v.pkl','rb'))
 df = pd.DataFrame(volunteering_dict)
+
 
 #Functions
 def make_clickable(link):
@@ -136,5 +139,4 @@ if selected3=='Recommend':
 if selected3=='Contact Us':
     st.header(":mailbox: Send us an Event")
     st.markdown(contact_form, unsafe_allow_html=True)
-    local_css("styles.css") 
-
+    local_css("styles.css")
