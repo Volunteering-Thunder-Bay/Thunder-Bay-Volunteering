@@ -48,9 +48,8 @@ selected3 = option_menu(None, ["Home", "Recommend", "Contact Us"],
 #st.markdown(hide_menu_style, unsafe_allow_html=True)
 
 
-
-df = pd.DataFrame(Volunteering - Sheet1.csv)
-
+volunteering_dict = pickle.load(open('v.pkl','rb'))
+df = pd.DataFrame(volunteering_dict)
 
 #Functions
 def make_clickable(link):
